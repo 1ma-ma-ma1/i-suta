@@ -1,0 +1,529 @@
+<!-- File: index.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐣 イースターエッグ抽選 🐣</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Helvetica Neue', 'Yu Gothic', sans-serif;
+    background: linear-gradient(135deg, #fdf6e3 0%, #fce4ec 50%, #e8f5e9 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow-x: hidden;
+  }
+
+  .container {
+    text-align: center;
+    padding: 20px;
+    max-width: 500px;
+    width: 100%;
+  }
+
+  h1 {
+    font-size: 1.6rem;
+    color: #5d4037;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    color: #8d6e63;
+    margin-bottom: 30px;
+  }
+
+  .eggs-container {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-bottom: 30px;
+  }
+
+  /* ===== イースターエッグ本体 ===== */
+  .egg {
+    width: 82px;
+    height: 108px;
+    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: 3px solid rgba(255,255,255,0.85);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.10), inset 0 -8px 18px rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+
+  /* パステルカラー5色 */
+  .egg:nth-child(1) { background: linear-gradient(160deg, #f8bbd0 0%, #f48fb1 100%); }
+  .egg:nth-child(2) { background: linear-gradient(160deg, #c8e6c9 0%, #81c784 100%); }
+  .egg:nth-child(3) { background: linear-gradient(160deg, #b3e5fc 0%, #81d4fa 100%); }
+  .egg:nth-child(4) { background: linear-gradient(160deg, #fff9c4 0%, #fff176 100%); }
+  .egg:nth-child(5) { background: linear-gradient(160deg, #d1c4e9 0%, #b39ddb 100%); }
+
+  /* 装飾レイヤー：帯＋ドット＋ジグザグ */
+  .egg::before,
+  .egg::after {
+    content: '';
+    position: absolute;
+    left: 0; right: 0;
+    pointer-events: none;
+  }
+
+  /* 中央の帯 */
+  .egg::before {
+    top: 42%;
+    height: 16%;
+    opacity: 0.35;
+  }
+  .egg:nth-child(1)::before { background: repeating-linear-gradient(90deg, #ad1457 0 4px, transparent 4px 10px); }
+  .egg:nth-child(2)::before { background: repeating-linear-gradient(90deg, #2e7d32 0 4px, transparent 4px 10px); }
+  .egg:nth-child(3)::before { background: repeating-linear-gradient(90deg, #0277bd 0 4px, transparent 4px 10px); }
+  .egg:nth-child(4)::before { background: repeating-linear-gradient(90deg, #f9a825 0 4px, transparent 4px 10px); }
+  .egg:nth-child(5)::before { background: repeating-linear-gradient(90deg, #6a1b9a 0 4px, transparent 4px 10px); }
+
+  /* ドット模様 */
+  .egg::after {
+    top: 0; bottom: 0;
+    border-radius: inherit;
+    opacity: 0.22;
+  }
+  .egg:nth-child(1)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 0 0 / 18px 18px; }
+  .egg:nth-child(2)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 6px 6px / 16px 16px; }
+  .egg:nth-child(3)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 4px 0 / 20px 20px; }
+  .egg:nth-child(4)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 0 4px / 14px 14px; }
+  .egg:nth-child(5)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 5px 5px / 18px 18px; }
+
+  /* ジグザグ帯（SVG背景） */
+  .egg .zigzag {
+    position: absolute;
+    left: 0; right: 0;
+    top: 22%;
+    height: 12%;
+    opacity: 0.25;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='10'%3E%3Cpath d='M0 5 L5 0 L10 5 L15 0 L20 5 L20 10 L15 5 L10 10 L5 5 L0 10Z' fill='white'/%3E%3C/svg%3E") repeat-x;
+    background-size: 20px 10px;
+    pointer-events: none;
+  }
+
+  /* ハイライト（光沢） */
+  .egg .shine {
+    position: absolute;
+    top: 12%;
+    left: 22%;
+    width: 22%;
+    height: 18%;
+    background: radial-gradient(ellipse, rgba(255,255,255,0.7) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+
+  .egg .egg-label {
+    position: relative;
+    z-index: 2;
+    font-size: 1.6rem;
+    pointer-events: none;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    opacity: 0;           /* 初期非表示（結果アイコン用） */
+    transition: opacity 0.3s;
+  }
+  .egg .egg-label.show { opacity: 1; }
+
+  /* ？マーク */
+  .egg .egg-question {
+    position: relative;
+    z-index: 2;
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    pointer-events: none;
+    transition: opacity 0.3s;
+  }
+  .egg .egg-question.hide { opacity: 0; }
+
+  .egg:hover:not(.disabled) {
+    transform: scale(1.15) rotate(-3deg);
+    box-shadow: 0 10px 28px rgba(0,0,0,0.18);
+  }
+
+  .egg.disabled {
+    cursor: default;
+    opacity: 0.35;
+    filter: grayscale(0.4) brightness(0.95);
+  }
+
+  .egg.selected {
+    opacity: 1 !important;
+    filter: none !important;
+    animation: eggBounce 0.6s ease;
+  }
+
+  @keyframes eggBounce {
+    0%   { transform: scale(1); }
+    30%  { transform: scale(1.3) rotate(5deg); }
+    50%  { transform: scale(0.9) rotate(-5deg); }
+    70%  { transform: scale(1.15) rotate(2deg); }
+    100% { transform: scale(1.1) rotate(0deg); }
+  }
+
+  /* ===== モーダル ===== */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.5);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease;
+  }
+  .modal-overlay.show { display: flex; }
+
+  .modal {
+    background: white;
+    border-radius: 20px;
+    padding: 35px 30px;
+    max-width: 380px;
+    width: 90%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  .modal .result-icon { font-size: 3.5rem; margin-bottom: 15px; }
+  .modal .result-title {
+    font-size: 1.3rem;
+    color: #5d4037;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  .modal .result-coupon {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #e65100;
+    background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+    border-radius: 12px;
+    padding: 15px;
+    margin: 15px 0;
+    border: 2px dashed #ffb74d;
+  }
+  .modal .result-note {
+    font-size: 0.8rem;
+    color: #999;
+    margin-top: 15px;
+  }
+
+  .close-btn {
+    margin-top: 18px;
+    padding: 10px 30px;
+    border: none;
+    border-radius: 25px;
+    background: linear-gradient(135deg, #8d6e63, #a1887f);
+    color: white;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .close-btn:hover { transform: scale(1.05); }
+
+  /* ===== クーポン表示 ===== */
+  .coupon-display {
+    display: none;
+    background: white;
+    border-radius: 16px;
+    padding: 25px 20px;
+    margin-top: 20px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+    border: 2px solid #ffcc80;
+  }
+  .coupon-display.show { display: block; }
+
+  .coupon-display .coupon-label {
+    font-size: 0.85rem;
+    color: #8d6e63;
+    margin-bottom: 8px;
+  }
+  .coupon-display .coupon-value {
+    font-size: 1.4rem;
+    font-weight: bold;
+    color: #e65100;
+  }
+  .coupon-display .coupon-date {
+    font-size: 0.75rem;
+    color: #bbb;
+    margin-top: 10px;
+  }
+  .coupon-display .coupon-id {
+    font-size: 0.7rem;
+    color: #ccc;
+    margin-top: 4px;
+    font-family: monospace;
+  }
+  .coupon-display .coupon-expire {
+    font-size: 0.75rem;
+    color: #e57373;
+    margin-top: 6px;
+    font-weight: bold;
+  }
+
+  /* ===== 抽選済み ===== */
+  .already-done {
+    display: none;
+    background: rgba(255,255,255,0.9);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+  }
+  .already-done.show { display: block; }
+  .already-done p {
+    color: #8d6e63;
+    font-size: 0.95rem;
+  }
+
+  .instruction {
+    font-size: 0.85rem;
+    color: #a1887f;
+    margin-bottom: 5px;
+  }
+
+  /* ===== 紙吹雪 ===== */
+  .confetti {
+    position: fixed;
+    top: -10px;
+    z-index: 200;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+    pointer-events: none;
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes popIn  { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes confettiFall {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  .footer {
+    margin-top: 30px;
+    font-size: 0.7rem;
+    color: #bcaaa4;
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <h1>🐣 Happy Easter! 🐣</h1>
+  <p class="subtitle">たまごを1つ選んでタップしてね！</p>
+
+  <div class="already-done" id="alreadyDone">
+    <p>🎉 すでに抽選済みです</p>
+  </div>
+
+  <div class="eggs-container" id="eggsContainer">
+    <div class="egg" data-index="0" onclick="selectEgg(this)">
+      <div class="zigzag"></div>
+      <div class="shine"></div>
+      <span class="egg-question">？</span>
+      <span class="egg-label" id="eggLabel0"></span>
+    </div>
+    <div class="egg" data-index="1" onclick="selectEgg(this)">
+      <div class="zigzag"></div>
+      <div class="shine"></div>
+      <span class="egg-question">？</span>
+      <span class="egg-label" id="eggLabel1"></span>
+    </div>
+    <div class="egg" data-index="2" onclick="selectEgg(this)">
+      <div class="zigzag"></div>
+      <div class="shine"></div>
+      <span class="egg-question">？</span>
+      <span class="egg-label" id="eggLabel2"></span>
+    </div>
+    <div class="egg" data-index="3" onclick="selectEgg(this)">
+      <div class="zigzag"></div>
+      <div class="shine"></div>
+      <span class="egg-question">？</span>
+      <span class="egg-label" id="eggLabel3"></span>
+    </div>
+    <div class="egg" data-index="4" onclick="selectEgg(this)">
+      <div class="zigzag"></div>
+      <div class="shine"></div>
+      <span class="egg-question">？</span>
+      <span class="egg-label" id="eggLabel4"></span>
+    </div>
+  </div>
+
+  <p class="instruction">※ 挑戦は1回限りです</p>
+
+  <div class="coupon-display" id="couponDisplay">
+    <div class="coupon-label">🎊 獲得クーポン</div>
+    <div class="coupon-value" id="couponValue"></div>
+    <div class="coupon-date" id="couponDate"></div>
+    <div class="coupon-expire" id="couponExpire"></div>
+    <div class="coupon-id" id="couponId"></div>
+  </div>
+
+  <div class="footer">🌸 リラクゼーションサロン イースターイベント 🌸</div>
+</div>
+
+<!-- 結果モーダル -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <div class="result-icon" id="resultIcon"></div>
+    <div class="result-title" id="resultTitle"></div>
+    <div class="result-coupon" id="resultCoupon"></div>
+    <div class="result-expire">有効期限：2026年4月30日</div>
+    <div class="result-note">スタッフにこの画面をお見せください</div>
+    <button class="close-btn" onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+  const COUPONS = [
+    { name: '10分延長',       weight: 5,  icon: '⏱️', msg: '施術10分延長サービス！' },
+    { name: 'オプション半額', weight: 15, icon: '✨', msg: 'お好きなオプションが半額！' },
+    { name: '500円引き',      weight: 15, icon: '💰', msg: 'お会計から500円OFF！' },
+    { name: 'スタンプ+1',     weight: 60, icon: '📌', msg: 'スタンプカード+1個！' }
+  ];
+
+  const STORAGE_KEY  = 'easter_lottery_2026';
+  const EXPIRE_DATE  = '2026年4月30日';
+  const EXPIRE_CHECK = new Date('2026-04-30T23:59:59+09:00');
+
+  function getResult() {
+    const totalWeight = COUPONS.reduce((s, c) => s + c.weight, 0);
+    const rand = Math.random() * totalWeight;
+    let cumulative = 0;
+    for (const coupon of COUPONS) {
+      cumulative += coupon.weight;
+      if (rand < cumulative) return coupon;
+    }
+    return COUPONS[COUPONS.length - 1];
+  }
+
+  function generateId() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let id = 'ES-';
+    for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)];
+    return id;
+  }
+
+  function isAlreadyDone() {
+    return localStorage.getItem(STORAGE_KEY) !== null;
+  }
+
+  function getSavedResult() {
+    const data = localStorage.getItem(STORAGE_KEY);
+    return data ? JSON.parse(data) : null;
+  }
+
+  function isExpired() {
+    return new Date() > EXPIRE_CHECK;
+  }
+
+  function selectEgg(el) {
+    if (isAlreadyDone() || isExpired()) return;
+
+    const eggs = document.querySelectorAll('.egg');
+    eggs.forEach(e => e.classList.add('disabled'));
+    el.classList.remove('disabled');
+    el.classList.add('selected');
+
+    const result = getResult();
+    const now = new Date();
+    const dateStr = now.toLocaleString('ja-JP', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit'
+    });
+    const couponId = generateId();
+
+    const saveData = {
+      coupon: result.name,
+      icon: result.icon,
+      msg: result.msg,
+      date: dateStr,
+      id: couponId,
+      expire: EXPIRE_DATE
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(saveData));
+
+    const idx = el.getAttribute('data-index');
+
+    setTimeout(() => {
+      // ？を隠してアイコン表示
+      el.querySelector('.egg-question').classList.add('hide');
+      const label = document.getElementById('eggLabel' + idx);
+      label.textContent = result.icon;
+      label.classList.add('show');
+
+      showConfetti();
+      setTimeout(() => showModal(saveData), 400);
+    }, 500);
+  }
+
+  function showModal(data) {
+    document.getElementById('resultIcon').textContent = data.icon;
+    document.getElementById('resultTitle').textContent = 'おめでとうございます！';
+    document.getElementById('resultCoupon').textContent = data.msg;
+    document.getElementById('modalOverlay').classList.add('show');
+  }
+
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('show');
+    showCouponDisplay();
+  }
+
+  function showCouponDisplay() {
+    const data = getSavedResult();
+    if (!data) return;
+    document.getElementById('couponValue').textContent  = data.icon + ' ' + data.coupon;
+    document.getElementById('couponDate').textContent   = '取得日時: ' + data.date;
+    document.getElementById('couponExpire').textContent  = '有効期限: ' + data.expire;
+    document.getElementById('couponId').textContent     = 'ID: ' + data.id;
+    document.getElementById('couponDisplay').classList.add('show');
+  }
+
+  function showConfetti() {
+    const colors = ['#ff6b6b','#ffd93d','#6bcb77','#4d96ff','#e84393','#fd79a8','#a29bfe'];
+    for (let i = 0; i < 60; i++) {
+      const c = document.createElement('div');
+      c.classList.add('confetti');
+      c.style.left = Math.random() * 100 + 'vw';
+      c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      c.style.width  = (Math.random() * 8 + 5) + 'px';
+      c.style.height = (Math.random() * 8 + 5) + 'px';
+      c.style.animationDuration = (Math.random() * 2 + 1.5) + 's';
+      c.style.animationDelay    = (Math.random() * 0.5) + 's';
+      document.body.appendChild(c);
+      setTimeout(() => c.remove(), 4000);
+    }
+  }
+
+  // ===== 初期化 =====
+  window.addEventListener('DOMContentLoaded', () => {
+    // 期限切れチェック
+    if (isExpired()) {
+      document.querySelector('.subtitle').textContent = 'このイベントは終了しました';
+      document.querySelectorAll('.egg').forEach(e => e.classList.add('disabled'));
+      return;
+    }
+
+    if (isAlreadyDone()) {
+      document.getElementById('alreadyDone').classList.add('show');
+      document.querySelectorAll('.egg').forEach(e => e.classList.add('disabled'));
+      showCouponDisplay();
+    }
+  });
+</script>
+
+</body>
+</html>
