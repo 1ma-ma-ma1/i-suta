@@ -1,4 +1,3 @@
-<!-- File: index.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -38,11 +37,14 @@
     margin-bottom: 30px;
   }
 
-  .eggs-container {
+  /* ===== 卵の行レイアウト（上2・下3） ===== */
+  .eggs-row {
     display: flex;
     justify-content: center;
-    flex-wrap: wrap;
     gap: 14px;
+    margin-bottom: 14px;
+  }
+  .eggs-row:last-of-type {
     margin-bottom: 30px;
   }
 
@@ -62,14 +64,16 @@
     overflow: hidden;
   }
 
-  /* パステルカラー5色 */
   .egg:nth-child(1) { background: linear-gradient(160deg, #f8bbd0 0%, #f48fb1 100%); }
   .egg:nth-child(2) { background: linear-gradient(160deg, #c8e6c9 0%, #81c784 100%); }
   .egg:nth-child(3) { background: linear-gradient(160deg, #b3e5fc 0%, #81d4fa 100%); }
-  .egg:nth-child(4) { background: linear-gradient(160deg, #fff9c4 0%, #fff176 100%); }
-  .egg:nth-child(5) { background: linear-gradient(160deg, #d1c4e9 0%, #b39ddb 100%); }
 
-  /* 装飾レイヤー：帯＋ドット＋ジグザグ */
+  .top-row .egg:nth-child(1) { background: linear-gradient(160deg, #f8bbd0 0%, #f48fb1 100%); }
+  .top-row .egg:nth-child(2) { background: linear-gradient(160deg, #c8e6c9 0%, #81c784 100%); }
+  .bottom-row .egg:nth-child(1) { background: linear-gradient(160deg, #b3e5fc 0%, #81d4fa 100%); }
+  .bottom-row .egg:nth-child(2) { background: linear-gradient(160deg, #fff9c4 0%, #fff176 100%); }
+  .bottom-row .egg:nth-child(3) { background: linear-gradient(160deg, #d1c4e9 0%, #b39ddb 100%); }
+
   .egg::before,
   .egg::after {
     content: '';
@@ -78,31 +82,28 @@
     pointer-events: none;
   }
 
-  /* 中央の帯 */
   .egg::before {
     top: 42%;
     height: 16%;
     opacity: 0.35;
   }
-  .egg:nth-child(1)::before { background: repeating-linear-gradient(90deg, #ad1457 0 4px, transparent 4px 10px); }
-  .egg:nth-child(2)::before { background: repeating-linear-gradient(90deg, #2e7d32 0 4px, transparent 4px 10px); }
-  .egg:nth-child(3)::before { background: repeating-linear-gradient(90deg, #0277bd 0 4px, transparent 4px 10px); }
-  .egg:nth-child(4)::before { background: repeating-linear-gradient(90deg, #f9a825 0 4px, transparent 4px 10px); }
-  .egg:nth-child(5)::before { background: repeating-linear-gradient(90deg, #6a1b9a 0 4px, transparent 4px 10px); }
+  .top-row .egg:nth-child(1)::before { background: repeating-linear-gradient(90deg, #ad1457 0 4px, transparent 4px 10px); }
+  .top-row .egg:nth-child(2)::before { background: repeating-linear-gradient(90deg, #2e7d32 0 4px, transparent 4px 10px); }
+  .bottom-row .egg:nth-child(1)::before { background: repeating-linear-gradient(90deg, #0277bd 0 4px, transparent 4px 10px); }
+  .bottom-row .egg:nth-child(2)::before { background: repeating-linear-gradient(90deg, #f9a825 0 4px, transparent 4px 10px); }
+  .bottom-row .egg:nth-child(3)::before { background: repeating-linear-gradient(90deg, #6a1b9a 0 4px, transparent 4px 10px); }
 
-  /* ドット模様 */
   .egg::after {
     top: 0; bottom: 0;
     border-radius: inherit;
     opacity: 0.22;
   }
-  .egg:nth-child(1)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 0 0 / 18px 18px; }
-  .egg:nth-child(2)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 6px 6px / 16px 16px; }
-  .egg:nth-child(3)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 4px 0 / 20px 20px; }
-  .egg:nth-child(4)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 0 4px / 14px 14px; }
-  .egg:nth-child(5)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 5px 5px / 18px 18px; }
+  .top-row .egg:nth-child(1)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 0 0 / 18px 18px; }
+  .top-row .egg:nth-child(2)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 6px 6px / 16px 16px; }
+  .bottom-row .egg:nth-child(1)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 4px 0 / 20px 20px; }
+  .bottom-row .egg:nth-child(2)::after { background: radial-gradient(circle 3px, #ffffff 40%, transparent 41%) 0 4px / 14px 14px; }
+  .bottom-row .egg:nth-child(3)::after { background: radial-gradient(circle 4px, #ffffff 40%, transparent 41%) 5px 5px / 18px 18px; }
 
-  /* ジグザグ帯（SVG背景） */
   .egg .zigzag {
     position: absolute;
     left: 0; right: 0;
@@ -114,7 +115,6 @@
     pointer-events: none;
   }
 
-  /* ハイライト（光沢） */
   .egg .shine {
     position: absolute;
     top: 12%;
@@ -132,12 +132,11 @@
     font-size: 1.6rem;
     pointer-events: none;
     text-shadow: 0 1px 4px rgba(0,0,0,0.08);
-    opacity: 0;           /* 初期非表示（結果アイコン用） */
+    opacity: 0;
     transition: opacity 0.3s;
   }
   .egg .egg-label.show { opacity: 1; }
 
-  /* ？マーク */
   .egg .egg-question {
     position: relative;
     z-index: 2;
@@ -216,6 +215,12 @@
     margin: 15px 0;
     border: 2px dashed #ffb74d;
   }
+  .modal .result-expire {
+    font-size: 0.8rem;
+    color: #e57373;
+    font-weight: bold;
+    margin-top: 5px;
+  }
   .modal .result-note {
     font-size: 0.8rem;
     color: #999;
@@ -262,17 +267,17 @@
     color: #bbb;
     margin-top: 10px;
   }
-  .coupon-display .coupon-id {
-    font-size: 0.7rem;
-    color: #ccc;
-    margin-top: 4px;
-    font-family: monospace;
-  }
   .coupon-display .coupon-expire {
     font-size: 0.75rem;
     color: #e57373;
     margin-top: 6px;
     font-weight: bold;
+  }
+  .coupon-display .coupon-id {
+    font-size: 0.7rem;
+    color: #ccc;
+    margin-top: 4px;
+    font-family: monospace;
   }
 
   /* ===== 抽選済み ===== */
@@ -329,7 +334,8 @@
     <p>🎉 すでに抽選済みです</p>
   </div>
 
-  <div class="eggs-container" id="eggsContainer">
+  <!-- 上段：2個 -->
+  <div class="eggs-row top-row">
     <div class="egg" data-index="0" onclick="selectEgg(this)">
       <div class="zigzag"></div>
       <div class="shine"></div>
@@ -342,6 +348,10 @@
       <span class="egg-question">？</span>
       <span class="egg-label" id="eggLabel1"></span>
     </div>
+  </div>
+
+  <!-- 下段：3個 -->
+  <div class="eggs-row bottom-row">
     <div class="egg" data-index="2" onclick="selectEgg(this)">
       <div class="zigzag"></div>
       <div class="shine"></div>
@@ -395,7 +405,7 @@
     { name: 'スタンプ+1',     weight: 60, icon: '📌', msg: 'スタンプカード+1個！' }
   ];
 
-  const STORAGE_KEY  = 'easter_lottery_2026_1';
+  const STORAGE_KEY  = 'easter_lottery_2026_2';
   const EXPIRE_DATE  = '2026年4月30日';
   const EXPIRE_CHECK = new Date('2026-04-30T23:59:59+09:00');
 
@@ -459,7 +469,6 @@
     const idx = el.getAttribute('data-index');
 
     setTimeout(() => {
-      // ？を隠してアイコン表示
       el.querySelector('.egg-question').classList.add('hide');
       const label = document.getElementById('eggLabel' + idx);
       label.textContent = result.icon;
@@ -508,9 +517,7 @@
     }
   }
 
-  // ===== 初期化 =====
   window.addEventListener('DOMContentLoaded', () => {
-    // 期限切れチェック
     if (isExpired()) {
       document.querySelector('.subtitle').textContent = 'このイベントは終了しました';
       document.querySelectorAll('.egg').forEach(e => e.classList.add('disabled'));
